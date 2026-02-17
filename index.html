@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anmelden bei Ihrem Microsoft-Konto</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f3f4f6;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Abstract background blobs */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: #e8edf5;
+      z-index: 0;
+    }
+
+    .bg::before {
+      content: "";
+      position: absolute;
+      top: -10%;
+      right: -5%;
+      width: 60%;
+      height: 80%;
+      background: linear-gradient(135deg, #c8d8f0 0%, #dce8f8 40%, #b8cce8 100%);
+      border-radius: 50% 40% 60% 30% / 40% 60% 30% 50%;
+      opacity: 0.7;
+      transform: rotate(-10deg);
+    }
+
+    .bg::after {
+      content: "";
+      position: absolute;
+      bottom: -10%;
+      left: -5%;
+      width: 55%;
+      height: 70%;
+      background: linear-gradient(225deg, #d0ddf0 0%, #c0d0e8 50%, #b0c4de 100%);
+      border-radius: 40% 60% 30% 50% / 60% 30% 50% 40%;
+      opacity: 0.6;
+      transform: rotate(15deg);
+    }
+
+    .blob-extra {
+      position: fixed;
+      top: 60%;
+      right: 10%;
+      width: 30%;
+      height: 40%;
+      background: linear-gradient(90deg, #c5d5e8 0%, #d8e4f0 100%);
+      border-radius: 60% 40% 50% 30% / 30% 50% 40% 60%;
+      opacity: 0.5;
+      z-index: 0;
+    }
+
+    /* Main layout */
+    .page-center {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 500px;
+      padding: 20px;
+    }
+
+    /* Login card */
+    .card {
+      background: #ffffff;
+      border-radius: 2px;
+      padding: 44px 44px 36px;
+      width: 100%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Microsoft logo */
+    .ms-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .ms-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+      width: 21px;
+      height: 21px;
+    }
+
+    .ms-grid span {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .ms-grid span:nth-child(1) { background: #f25022; }
+    .ms-grid span:nth-child(2) { background: #7fba00; }
+    .ms-grid span:nth-child(3) { background: #00a4ef; }
+    .ms-grid span:nth-child(4) { background: #ffb900; }
+
+    .ms-logo-text {
+      font-size: 18px;
+      color: #1b1b1b;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    /* Heading */
+    .heading {
+      font-size: 24px;
+      font-weight: 600;
+      color: #1b1b1b;
+      margin-bottom: 20px;
+      letter-spacing: -0.3px;
+    }
+
+    /* Input */
+    .input-group {
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .input-field {
+      width: 100%;
+      border: none;
+      border-bottom: 1px solid #666;
+      padding: 8px 0 6px;
+      font-size: 15px;
+      color: #1b1b1b;
+      background: transparent;
+      outline: none;
+      transition: border-color 0.15s;
+      caret-color: #0067b8;
+    }
+
+    .input-field::placeholder {
+      color: #888;
+      font-size: 14px;
+    }
+
+    .input-field:focus {
+      border-bottom: 2px solid #0067b8;
+      padding-bottom: 5px;
+    }
+
+    /* Links */
+    .link-row {
+      margin-bottom: 8px;
+    }
+
+    .ms-link {
+      font-size: 13px;
+      color: #1b1b1b;
+    }
+
+    .ms-link a {
+      color: #0067b8;
+      text-decoration: none;
+    }
+
+    .ms-link a:hover {
+      text-decoration: underline;
+    }
+
+    .ms-link-standalone {
+      display: block;
+      font-size: 13px;
+      color: #0067b8;
+      text-decoration: none;
+      margin-bottom: 20px;
+    }
+
+    .ms-link-standalone:hover {
+      text-decoration: underline;
+    }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    .btn {
+      padding: 6px 20px;
+      font-size: 15px;
+      font-family: "Segoe UI", sans-serif;
+      border: 1px solid transparent;
+      cursor: pointer;
+      min-width: 108px;
+      height: 32px;
+      font-weight: 400;
+      transition: background 0.1s, border-color 0.1s;
+    }
+
+    .btn-back {
+      background: #e8e8e8;
+      color: #1b1b1b;
+      border-color: #e8e8e8;
+    }
+
+    .btn-back:hover {
+      background: #d5d5d5;
+      border-color: #d5d5d5;
+    }
+
+    .btn-next {
+      background: #0067b8;
+      color: #fff;
+      border-color: #0067b8;
+    }
+
+    .btn-next:hover {
+      background: #005a9e;
+      border-color: #005a9e;
+    }
+
+    /* Sign-in options card */
+    .options-card {
+      background: #ffffff;
+      border-radius: 2px;
+      padding: 14px 20px;
+      width: 100%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .options-card:hover {
+      background: #f5f5f5;
+    }
+
+    .options-icon {
+      color: #555;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+    }
+
+    .options-text {
+      font-size: 14px;
+      color: #1b1b1b;
+    }
+
+    /* ---- POPUP OVERLAY ---- */
+    .popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .popup-overlay.show {
+      display: flex;
+    }
+
+    .popup-box {
+      background: #fff;
+      border-radius: 4px;
+      padding: 40px 48px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+      max-width: 360px;
+      width: 90%;
+      animation: popIn 0.18s ease-out;
+    }
+
+    @keyframes popIn {
+      from { transform: scale(0.85); opacity: 0; }
+      to   { transform: scale(1);    opacity: 1; }
+    }
+
+    .popup-emoji {
+      font-size: 52px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .popup-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1b1b1b;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .popup-sub {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .popup-btn {
+      background: #0067b8;
+      color: #fff;
+      border: none;
+      padding: 8px 28px;
+      font-size: 14px;
+      font-family: "Segoe UI", sans-serif;
+      cursor: pointer;
+      border-radius: 2px;
+      transition: background 0.1s;
+    }
+
+    .popup-btn:hover {
+      background: #005a9e;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg"></div>
+  <div class="blob-extra"></div>
+
+  <div class="page-center">
+    <!-- Main login card -->
+    <div class="card">
+      <!-- Microsoft logo -->
+      <div class="ms-logo">
+        <div class="ms-grid">
+          <span></span><span></span>
+          <span></span><span></span>
+        </div>
+        <span class="ms-logo-text">Microsoft</span>
+      </div>
+
+      <h1 class="heading">Anmelden</h1>
+
+      <!-- Input -->
+      <div class="input-group">
+        <input
+          class="input-field"
+          type="text"
+          placeholder="E-Mail, Telefon oder Skype"
+          id="emailInput"
+        />
+      </div>
+
+      <!-- Links -->
+      <div class="link-row">
+        <span class="ms-link">Kein Konto? <a href="#" onclick="gotYou(event)">Erstellen Sie jetzt eins!</a></span>
+      </div>
+      <a href="#" class="ms-link-standalone" onclick="gotYou(event)">Sie können nicht auf Ihr Konto zugreifen?</a>
+
+      <!-- Buttons -->
+      <div class="btn-row">
+        <button class="btn btn-back" onclick="gotYou(event)">Zurück</button>
+        <button class="btn btn-next" onclick="gotYou(event)">Weiter</button>
+      </div>
+    </div>
+
+    <!-- Sign-in options card -->
+    <div class="options-card" onclick="gotYou(event)">
+      <span class="options-icon">
+        <!-- key icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="7.5" cy="15.5" r="5.5"/>
+          <path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/>
+        </svg>
+      </span>
+      <span class="options-text">Anmeldeoptionen</span>
+    </div>
+  </div>
+
+  <!-- GOT YOU popup -->
+  <div class="popup-overlay" id="popup" onclick="closePopup(event)">
+    <div class="popup-box">
+      <span class="popup-emoji">🎣</span>
+      <div class="popup-title">STOP!</div>
+      <div class="popup-sub">Du hättest soeben dein Passwort an Kriminelle übermittelt. In echten Fällen hätten Angreifer jetzt Zugriff auf dein Konto.</div>
+      <button class="popup-btn" onclick="hidePopup()">OK, ich passe nächstes mal besser auf!</button>
+    </div>
+  </div>
+
+  <script>
+    // Tracking configuration
+    var TRACKING_URL = "https://script.google.com/macros/s/AKfycbxGWPfD-KEM8HY4G2Z6GdjLMiWs7ZhRj_ASMGYfrCXdWw26tqq5tZDbIXmwm51pqni-Kg/exec";
+    
+    // Get email from URL parameter
+    function getEmailFromUrl() {
+      var params = new URLSearchParams(window.location.search);
+      return params.get('email') || '';
+    }
+    
+    // Track event to Google Sheets
+    function trackEvent(action) {
+      var email = getEmailFromUrl();
+      if (!email) return;
+      
+      var url = TRACKING_URL + '?email=' + encodeURIComponent(email) + '&action=' + encodeURIComponent(action);
+      fetch(url, { mode: 'no-cors' }).catch(function() {});
+    }
+    
+    // Track page load (link click)
+    trackEvent('click');
+    
+    // Trigger popup on any input activity
+    document.getElementById("emailInput").addEventListener("input", function () {
+      showPopup();
+    });
+
+    document.getElementById("emailInput").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") showPopup();
+    });
+
+    function gotYou(e) {
+      e.preventDefault();
+      showPopup();
+    }
+
+    function showPopup() {
+      // Track credential submission before showing popup
+      var emailInput = document.getElementById("emailInput").value;
+      if (emailInput && emailInput.length > 0) {
+        trackEvent('credential_submit');
+      }
+      
+      document.getElementById("popup").classList.add("show");
+      document.getElementById("emailInput").blur();
+    }
+
+    function hidePopup() {
+      document.getElementById("popup").classList.remove("show");
+      document.getElementById("emailInput").value = "";
+    }
+
+    // Click on overlay background to close
+    function closePopup(e) {
+      if (e.target === document.getElementById("popup")) {
+        hidePopup();
+      }
+    }
+  </script>
+</body>
+</html>
